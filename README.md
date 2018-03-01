@@ -1,5 +1,5 @@
-Example of a self contained VST3 plugin
-=======================================
+Example of a self contained VST3/VST2 plugin
+============================================
 
 Why this project?
 -----------------
