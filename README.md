@@ -15,6 +15,10 @@ What this project is not
 ------------------------
 This project is not a tutorial on how to write a VST3 plugin. It only deals with building a plugin *outside* the SDK.
 
+New - August 2018
+-----------------
+Although this project is still valid, you should check "Jamba":https://github.com/pongasoft/jamba which offers a simple command line tool to create a blank self contained plugin which *depends* on the SDK. Jamba also offers a lot of additional features.
+
 Configuration and requirements
 ------------------------------
 This project is known to work on macOS High Siera 10.13.3 with Xcode 9.2 installed. It requires `cmake` version 3.9 at the minimum. Because it uses `cmake` it should work on other platforms but it has not been tested.
