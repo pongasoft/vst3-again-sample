@@ -17,7 +17,7 @@ This project is not a tutorial on how to write a VST3 plugin. It only deals with
 
 New - August 2018
 -----------------
-Although this project is still valid, you should check "Jamba":https://github.com/pongasoft/jamba which offers a simple command line tool to create a blank self contained plugin which *depends* on the SDK. Jamba also offers a lot of additional features.
+Although this project is still valid, you should check [Jamba](https://github.com/pongasoft/jamba) which offers a simple command line tool to create a blank self contained plugin which *depends* on the SDK. Jamba also offers a lot of additional features.
 
 Configuration and requirements
 ------------------------------
