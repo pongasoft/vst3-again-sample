@@ -47,7 +47,7 @@ namespace Vst {
 // AGainUIMessageController
 //------------------------------------------------------------------------
 template <typename ControllerType>
-class AGainUIMessageController : public VSTGUI::IController, public VSTGUI::IViewListenerAdapter
+class AGainUIMessageController : public VSTGUI::IController, public VSTGUI::ViewListenerAdapter
 {
 public:
 	enum Tags
@@ -58,9 +58,10 @@ public:
 	AGainUIMessageController (ControllerType* againController) : againController (againController), textEdit (nullptr)
 	{
 	}
-	~AGainUIMessageController ()
+	~AGainUIMessageController () override
 	{
-		viewWillDelete (textEdit);
+		if (textEdit)
+			viewWillDelete (textEdit);
 		againController->removeUIMessageController (this);
 	}
 
@@ -74,10 +75,12 @@ public:
 	}
 
 private:
-	typedef VSTGUI::CControl CControl;
-	typedef VSTGUI::CView CView;
-	typedef VSTGUI::CTextEdit CTextEdit;
-	typedef VSTGUI::UTF8String UTF8String;
+	using CControl = VSTGUI::CControl;
+	using CView = VSTGUI::CView;
+	using CTextEdit = VSTGUI::CTextEdit;
+	using UTF8String = VSTGUI::UTF8String;
+	using UIAttributes = VSTGUI::UIAttributes;
+	using IUIDescription = VSTGUI::IUIDescription;
 
 	//--- from IControlListener ----------------------
 	void valueChanged (CControl* /*pControl*/) override {}
@@ -111,7 +114,7 @@ private:
 	//--- from IControlListener ----------------------
 	//--- is called when a view is created -----
 	CView* verifyView (CView* view, const UIAttributes& /*attributes*/,
-					   const IUIDescription* /*description*/) override
+	                   const IUIDescription* /*description*/) override
 	{
 		if (CTextEdit* te = dynamic_cast<CTextEdit*> (view))
 		{
@@ -148,7 +151,7 @@ private:
 			String128 messageText;
 			String str;
 			str.fromUTF8 (text.data ());
-			str.copyTo (messageText, 128);
+			str.copyTo (messageText, 0, 128);
 			againController->setDefaultMessageText (messageText);
 		}
 	}

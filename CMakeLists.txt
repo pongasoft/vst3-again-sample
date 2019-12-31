@@ -1,9 +1,17 @@
+# root CMakeLists.txt for vst3-again-sample built out of source.
+# to run, set VST3_SDK_ROOT to inform CMake where the VST3 SDK is, for example:
+# mkdir build
+# cd build
+# cmake -DVST3_SDK_ROOT=/Users/randy/dev/vst3sdk -DCMAKE_BUILD_TYPE=Debug ..
+#
+
 cmake_minimum_required (VERSION 3.9)
 
 # build VST 2 by default
 option(SMTG_CREATE_VST2_VERSION "Use VST2" ON)
 
 set(VST3_SDK_ROOT "" CACHE PATH "Location of VST3 SDK")
+set(public_sdk_SOURCE_DIR ${VST3_SDK_ROOT}/public.sdk)
 
 project(SteinbergAgainSample)
 
@@ -45,7 +53,7 @@ if(MAC OR WIN)
 endif()
 
 set(target again)
-smtg_add_vst3plugin(${target} ${VST3_SDK_ROOT} ${again_sources})
+smtg_add_vst3plugin(${target} ${again_sources})
 set_target_properties(${target} PROPERTIES ${SDK_IDE_PLUGIN_EXAMPLES_FOLDER})
 target_include_directories(${target} PUBLIC ${VSTGUI_ROOT}/vstgui4)
 target_link_libraries(${target} PRIVATE base sdk vstgui_support)

@@ -10,7 +10,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2019, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -102,6 +102,9 @@ protected:
 	SampleType processAudio (SampleType** input, SampleType** output, int32 numChannels,
 	                         int32 sampleFrames, float gain);
 
+	template <typename SampleType>
+	SampleType processVuPPM (SampleType** input, int32 numChannels, int32 sampleFrames);
+
 	// our model values
 	float fGain;
 	float fGainReduction;
@@ -109,8 +112,8 @@ protected:
 
 	int32 currentProcessMode;
 
-	bool bHalfGain;
-	bool bBypass;
+	bool bHalfGain {false};
+	bool bBypass {false};
 };
 
 //------------------------------------------------------------------------

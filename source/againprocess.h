@@ -10,7 +10,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2019, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -61,6 +61,32 @@ SampleType AGain::processAudio (SampleType** in, SampleType** out, int32 numChan
 			tmp = (*ptrIn++) * gain;
 			(*ptrOut++) = tmp;
 
+			// check only positive values
+			if (tmp > vuPPM)
+			{
+				vuPPM = tmp;
+			}
+		}
+	}
+	return vuPPM;
+}
+
+
+//------------------------------------------------------------------------
+template <typename SampleType>
+SampleType AGain::processVuPPM (SampleType** in, int32 numChannels,	int32 sampleFrames)
+{
+	SampleType vuPPM = 0;
+
+	for (int32 i = 0; i < numChannels; i++)
+	{
+		int32 samples = sampleFrames;
+		SampleType* ptrIn = (SampleType*)in[i];
+		SampleType tmp;
+		while (--samples >= 0)
+		{
+			tmp = (*ptrIn++);
+			
 			// check only positive values
 			if (tmp > vuPPM)
 			{

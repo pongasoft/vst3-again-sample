@@ -8,7 +8,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2019, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@
 #include "againuimessagecontroller.h"
 #include "version.h" // for versionning
 
-#include "public.sdk/source/main/pluginfactoryvst3.h"
+#include "public.sdk/source/main/pluginfactory.h"
 #include "public.sdk/source/vst/vstaudioprocessoralgo.h"
 
 #include "pluginterfaces/base/ibstream.h"
@@ -52,9 +52,12 @@
 
 #include <math.h>
 #include <stdio.h>
+#include "base/source/fstreamer.h"
 
 // this allows to enable the communication example between again and its controller
 #define AGAIN_TEST 1
+
+using namespace VSTGUI;
 
 namespace Steinberg {
 namespace Vst {
@@ -149,7 +152,7 @@ tresult PLUGIN_API AGainSimple::initialize (FUnknown* context)
 	//---Create Parameters------------
 
 	//---Gain parameter--
-	GainParameter* gainParam = new GainParameter (ParameterInfo::kCanAutomate, kGainId);
+	auto* gainParam = new GainParameter (ParameterInfo::kCanAutomate, kGainId);
 	parameters.addParameter (gainParam);
 
 	//---VuMeter parameter---
@@ -157,14 +160,14 @@ tresult PLUGIN_API AGainSimple::initialize (FUnknown* context)
 	ParamValue defaultVal = 0;
 	int32 flags = ParameterInfo::kIsReadOnly;
 	int32 tag = kVuPPMId;
-	parameters.addParameter (USTRING ("VuPPM"), 0, stepCount, defaultVal, flags, tag);
+	parameters.addParameter (USTRING ("VuPPM"), nullptr, stepCount, defaultVal, flags, tag);
 
 	//---Bypass parameter---
 	stepCount = 1;
 	defaultVal = 0;
 	flags = ParameterInfo::kCanAutomate | ParameterInfo::kIsBypass;
 	tag = kBypassId;
-	parameters.addParameter (USTRING ("Bypass"), 0, stepCount, defaultVal, flags, tag);
+	parameters.addParameter (USTRING ("Bypass"), nullptr, stepCount, defaultVal, flags, tag);
 
 	//---Custom state init------------
 
@@ -382,29 +385,18 @@ tresult PLUGIN_API AGainSimple::setState (IBStream* state)
 	// we receive the current  (processor part)
 	// called when we load a preset, the model has to be reloaded
 
+	IBStreamer streamer (state, kLittleEndian);
 	float savedGain = 0.f;
-	if (state->read (&savedGain, sizeof (float)) != kResultOk)
-	{
+	if (streamer.readFloat (savedGain) == false)
 		return kResultFalse;
-	}
 
 	float savedGainReduction = 0.f;
-	if (state->read (&savedGainReduction, sizeof (float)) != kResultOk)
-	{
+	if (streamer.readFloat (savedGainReduction) == false)
 		return kResultFalse;
-	}
 
 	int32 savedBypass = 0;
-	if (state->read (&savedBypass, sizeof (int32)) != kResultOk)
-	{
+	if (streamer.readInt32 (savedBypass) == false)
 		return kResultFalse;
-	}
-
-#if BYTEORDER == kBigEndian
-	SWAP_32 (savedGain)
-	SWAP_32 (savedGainReduction)
-	SWAP_32 (savedBypass)
-#endif
 
 	fGain = savedGain;
 	fGainReduction = savedGainReduction;
@@ -412,7 +404,6 @@ tresult PLUGIN_API AGainSimple::setState (IBStream* state)
 
 	setParamNormalized (kGainId, savedGain);
 	setParamNormalized (kBypassId, bBypass);
-
 
 	// Example of using the IStreamAttributes interface
 	FUnknownPtr<IStreamAttributes> stream (state);
@@ -452,19 +443,11 @@ tresult PLUGIN_API AGainSimple::getState (IBStream* state)
 {
 	// here we need to save the model
 
-	float toSaveGain = fGain;
-	float toSaveGainReduction = fGainReduction;
-	int32 toSaveBypass = bBypass ? 1 : 0;
+	IBStreamer streamer (state, kLittleEndian);
 
-#if BYTEORDER == kBigEndian
-	SWAP_32 (toSaveGain)
-	SWAP_32 (toSaveGainReduction)
-	SWAP_32 (toSaveBypass)
-#endif
-
-	state->write (&toSaveGain, sizeof (float));
-	state->write (&toSaveGainReduction, sizeof (float));
-	state->write (&toSaveBypass, sizeof (int32));
+	streamer.writeFloat (fGain);
+	streamer.writeFloat (fGainReduction);
+	streamer.writeInt32 (bBypass ? 1 : 0);
 
 	return kResultOk;
 }
@@ -490,7 +473,7 @@ tresult PLUGIN_API AGainSimple::setBusArrangements (SpeakerArrangement* inputs, 
 		if (SpeakerArr::getChannelCount (inputs[0]) == 1 &&
 		    SpeakerArr::getChannelCount (outputs[0]) == 1)
 		{
-			AudioBus* bus = FCast<AudioBus> (audioInputs.at (0));
+			auto* bus = FCast<AudioBus> (audioInputs.at (0));
 			if (bus)
 			{
 				// check if we are Mono => Mono, if not we need to recreate the buses
@@ -498,7 +481,7 @@ tresult PLUGIN_API AGainSimple::setBusArrangements (SpeakerArrangement* inputs, 
 				{
 					removeAudioBusses ();
 					addAudioInput  (STR16 ("Mono In"),  inputs[0]);
-					addAudioOutput (STR16 ("Mono Out"), inputs[0]);
+					addAudioOutput (STR16 ("Mono Out"), outputs[0]);
 				}
 				return kResultOk;
 			}
@@ -506,7 +489,7 @@ tresult PLUGIN_API AGainSimple::setBusArrangements (SpeakerArrangement* inputs, 
 		// the host wants something else than Mono => Mono, in this case we are always Stereo => Stereo
 		else
 		{
-			AudioBus* bus = FCast<AudioBus> (audioInputs.at (0));
+			auto* bus = FCast<AudioBus> (audioInputs.at (0));
 			if (bus)
 			{
 				tresult result = kResultFalse;
@@ -554,10 +537,10 @@ IPlugView* PLUGIN_API AGainSimple::createView (const char* name)
 	// someone wants my editor
 	if (name && strcmp (name, ViewType::kEditor) == 0)
 	{
-		VST3Editor* view = new VST3Editor (this, "view", "again.uidesc");
+		auto* view = new VST3Editor (this, "view", "again.uidesc");
 		return view;
 	}
-	return 0;
+	return nullptr;
 }
 
 //------------------------------------------------------------------------
@@ -567,11 +550,11 @@ IController* AGainSimple::createSubController (UTF8StringPtr name,
 {
 	if (UTF8StringView (name) == "MessageController")
 	{
-		UIMessageController* controller = new UIMessageController (this);
+		auto* controller = new UIMessageController (this);
 		addUIMessageController (controller);
 		return controller;
 	}
-	return 0;
+	return nullptr;
 }
 
 //------------------------------------------------------------------------
@@ -592,10 +575,8 @@ tresult PLUGIN_API AGainSimple::setEditorState (IBStream* state)
 			SWAP_16 (defaultMessageText[i])
 	}
 
-	for (UIMessageControllerList::iterator it = uiMessageControllers.begin (),
-	                                       end = uiMessageControllers.end ();
-	     it != end; ++it)
-		(*it)->setMessageText (defaultMessageText);
+	for (auto& uiMessageController : uiMessageControllers)
+		uiMessageController->setMessageText (defaultMessageText);
 
 	return result;
 }
@@ -605,12 +586,17 @@ tresult PLUGIN_API AGainSimple::getEditorState (IBStream* state)
 {
 	// here we can save UI settings for example
 
+	IBStreamer streamer (state, kLittleEndian);
+
 	// as we save a Unicode string, we must know the byteorder when setState is called
 	int8 byteOrder = BYTEORDER;
-	if (state->write (&byteOrder, sizeof (int8)) == kResultTrue)
-		return state->write (defaultMessageText, 128 * sizeof (TChar));
+	if (streamer.writeInt8 (byteOrder) == false)
+		return kResultFalse;
 
-	return kResultFalse;
+	if (streamer.writeRaw (defaultMessageText, 128 * sizeof (TChar)) == false)
+		return kResultFalse;
+
+	return kResultTrue;
 }
 
 //------------------------------------------------------------------------
@@ -704,7 +690,7 @@ BEGIN_FACTORY_DEF ("Steinberg Media Technologies",
 				PClassInfo::kManyInstances,					// cardinality  
 				kVstAudioEffectClass,						// the component category (do not changed this)
 				"AGainSimple VST3",							// here the Plug-in name (to be changed)
-				0,											// single component effects can not be destributed so this is zero
+				0,											// single component effects can not be distributed so this is zero
 				"Fx",										// Subcategory for this Plug-in (to be changed)
 				FULL_VERSION_STR,							// Plug-in version (to be changed)
 				kVstVersionString,							// the VST 3 SDK version (do not changed this, use always this define)

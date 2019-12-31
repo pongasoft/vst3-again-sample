@@ -8,7 +8,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2019, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -37,13 +37,18 @@
 #include "again.h"	// for AGain
 #include "againsidechain.h"	// for AGain SideChain
 #include "againcontroller.h" // for AGainController
-#include "againcids.h"	// for class ids
+#include "againcids.h"	// for class ids and categrory
 #include "version.h"	// for versioning
 
-#include "public.sdk/source/main/pluginfactoryvst3.h"
+#include "public.sdk/source/main/pluginfactory.h"
 
 #define stringPluginName "AGain VST3"
 #define stringPluginSideChainName "AGain SideChain VST3"
+
+#if TARGET_OS_IPHONE
+#include "public.sdk/source/vst/vstguieditor.h"
+extern void* moduleHandle;
+#endif
 
 //------------------------------------------------------------------------
 //  Module init/exit
@@ -51,16 +56,19 @@
 
 //------------------------------------------------------------------------
 // called after library was loaded
-bool InitModule ()   
+bool InitModule ()
 {
-	return true; 
+#if TARGET_OS_IPHONE
+	Steinberg::Vst::VSTGUIEditor::setBundleRef (moduleHandle);
+#endif
+	return true;
 }
 
 //------------------------------------------------------------------------
 // called after library is unloaded
 bool DeinitModule ()
 {
-	return true; 
+	return true;
 }
 
 using namespace Steinberg::Vst;
@@ -79,18 +87,18 @@ BEGIN_FACTORY_DEF ("Steinberg Media Technologies",
 	//---First Plug-in included in this factory-------
 	// its kVstAudioEffectClass component
 	DEF_CLASS2 (INLINE_UID_FROM_FUID(AGainProcessorUID),
-				PClassInfo::kManyInstances,	// cardinality  
-				kVstAudioEffectClass,		// the component category (do not changed this)
-				stringPluginName,			// here the Plug-in name (to be changed)
+				PClassInfo::kManyInstances,	// cardinality
+				kVstAudioEffectClass,	// the component category (do not changed this)
+				stringPluginName,		// here the Plug-in name (to be changed)
 				Vst::kDistributable,	// means that component and controller could be distributed on different computers
-				"Fx",					// Subcategory for this Plug-in (to be changed)
+				AGainVST3Category,		// Subcategory for this Plug-in (to be changed)
 				FULL_VERSION_STR,		// Plug-in version (to be changed)
 				kVstVersionString,		// the VST 3 SDK version (do not changed this, use always this define)
 				Steinberg::Vst::AGain::createInstance)	// function pointer called when this component should be instantiated
 
 	// its kVstComponentControllerClass component
 	DEF_CLASS2 (INLINE_UID_FROM_FUID (AGainControllerUID),
-				PClassInfo::kManyInstances,  // cardinality   
+				PClassInfo::kManyInstances, // cardinality
 				kVstComponentControllerClass,// the Controller category (do not changed this)
 				stringPluginName "Controller",	// controller name (could be the same than component name)
 				0,						// not used here
@@ -101,11 +109,11 @@ BEGIN_FACTORY_DEF ("Steinberg Media Technologies",
 
 	//---Second Plug-in (AGain with sidechain (only component, use the same controller) included in this factory-------
 	DEF_CLASS2 (INLINE_UID_FROM_FUID(AGainWithSideChainProcessorUID),
-				PClassInfo::kManyInstances,	// cardinality  
+				PClassInfo::kManyInstances,	// cardinality
 				kVstAudioEffectClass,		// the component category (do not changed this)
 				stringPluginSideChainName,	// here the Plug-in name (to be changed)
 				Vst::kDistributable,	// means that component and controller could be distributed on different computers
-				"Fx",					// Subcategory for this Plug-in (to be changed)
+				AGainVST3Category,		// Subcategory for this Plug-in (to be changed)
 				FULL_VERSION_STR,		// Plug-in version (to be changed)
 				kVstVersionString,		// the VST 3 SDK version (do not changed this, use always this define)
 				Steinberg::Vst::AGainWithSideChain::createInstance)	// function pointer called when this component should be instantiated
