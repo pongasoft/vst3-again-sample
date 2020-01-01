@@ -114,9 +114,9 @@ if(SMTG_MAC AND XCODE AND SMTG_COREAUDIO_SDK_PATH AND SMTG_ADD_VSTGUI)
     add_dependencies(${target} again)
     add_custom_command(TARGET ${target} POST_BUILD 
         COMMAND /bin/mkdir "-p" ${outputdir}/${target}.component/Contents/Resources
-        COMMAND /bin/rm "-f" "${outputdir}/${target}.component/Contents/Resources/plugin.vst3"
-        COMMAND /bin/ln "-svfF" "${outputdir}/again.vst3" "${outputdir}/${target}.component/Contents/Resources/plugin.vst3"
-        COMMAND /bin/ln "-svfF" "${outputdir}/${target}.component" "~/Library/Audio/Plug-Ins/Components/"
+        COMMAND /bin/rm "-rf" "${outputdir}/${target}.component/Contents/Resources/plugin.vst3"
+        COMMAND ditto "-v" "${outputdir}/again.vst3" "${outputdir}/${target}.component/Contents/Resources/plugin.vst3"
+	    COMMAND ditto "-v" "${outputdir}/${target}.component" "~/Library/Audio/Plug-Ins/Components/${target}.component"
     )
 
     execute_process(COMMAND xcrun --find Rez OUTPUT_VARIABLE OSX_REZ_COMMAND OUTPUT_STRIP_TRAILING_WHITESPACE)
