@@ -85,7 +85,7 @@ add_subdirectory(${VST3_SDK_ROOT}/public.sdk/samples/vst-hosting/validator vst3-
 
 #---Add Wrappers (AU, AAX)-----------------------
 if (SMTG_COREAUDIO_SDK_PATH)
-  add_subdirectory(${VST3_SDK_ROOT}/public.sdk/source/vst/aaxwrapper vst3-sdk/aaxwrapper)
+  add_subdirectory(${VST3_SDK_ROOT}/public.sdk/source/vst/auwrapper vst3-sdk/auwrapper)
 endif()
 
 if(SMTG_AAX_SDK_PATH)
