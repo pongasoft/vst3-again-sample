@@ -130,10 +130,10 @@ if(SMTG_MAC AND XCODE AND SMTG_COREAUDIO_SDK_PATH AND SMTG_ADD_VSTGUI)
         "-I" "/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Versions/A/Headers"
         "-I" "/System/Library/Frameworks/AudioUnit.framework/Versions/A/Headers/"
         "-I" "${SMTG_COREAUDIO_SDK_PATH}/AudioUnits/AUPublic/AUBase"
+        "-I" "${CMAKE_CURRENT_LIST_DIR}/source/au"
         "-I" "${CMAKE_CURRENT_LIST_DIR}"
         "-o" "${outputdir}/${target}.component/Contents/Resources/again_au.rsrc"
         "-useDF"
-#        "${VST3_SDK_ROOT}/public.sdk/source/vst/auwrapper/auresource.r"
          "${CMAKE_CURRENT_LIST_DIR}/source/auresource.r"
     )
 
