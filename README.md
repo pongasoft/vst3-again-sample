@@ -1,6 +1,10 @@
 Example of a self contained VST3/VST2 plugin
 ============================================
 
+Note 2020/01
+------------
+This project was created in 2018 using the VST3 SDK 3.6.9 which includes VST2. More recent versions of the SDK have removed VST2 support. Although this project is still valid as long as you use 3.6.9, you should check [Jamba](https://jamba.dev) which offers a very easy way to bootstrap a blank self contained plugin which *depends* on the SDK. Jamba also offers a lot of additional features.
+
 Why this project?
 -----------------
 The latest VST3 SDK (3.6.9) provides instructions to build a VST that doesn't live inside the SDK itself which is a big enhancement from prior versions which did not provide this capability.
@@ -15,17 +19,13 @@ What this project is not
 ------------------------
 This project is not a tutorial on how to write a VST3 plugin. It only deals with building a plugin *outside* the SDK.
 
-New - August 2018
------------------
-Although this project is still valid, you should check [Jamba](https://github.com/pongasoft/jamba) which offers a simple command line tool to create a blank self contained plugin which *depends* on the SDK. Jamba also offers a lot of additional features.
-
 Configuration and requirements
 ------------------------------
 This project is known to work on macOS High Siera 10.13.3 with Xcode 9.2 installed. It requires `cmake` version 3.9 at the minimum. Because it uses `cmake` it should work on other platforms but it has not been tested.
 
 Downloading the SDK
 -------------------
-You need to download the VST3 SDK from [steinberg](https://download.steinberg.net/sdk_downloads/vstsdk369_01_03_2018_build_132.zip) (3.6.9 as of 2018/03/01 and what is used in this project) (shasum 256 => `7c6c2a5f0bcbf8a7a0d6a42b782f0d3c00ec8eafa4226bbf2f5554e8cd764964`).
+You need to download the [VST3 SDK version 3.6.9](https://github.com/pongasoft/vst3sdk/releases/download/vst369_01_03_2018_build132/vstsdk369_01_03_2018_build_132.zip) (3.6.9 as of 2018/03/01 and what is used in this project) (shasum 256 => `7c6c2a5f0bcbf8a7a0d6a42b782f0d3c00ec8eafa4226bbf2f5554e8cd764964`).
 
 Installing the SDK
 -------------------
