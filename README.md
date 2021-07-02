@@ -3,11 +3,11 @@ Example of a self contained VST3/VST2 plugin
 
 Why this project?
 -----------------
-The latest VST3 SDK (3.6.9) provides instructions to build a VST that doesn't live inside the SDK itself which is a big enhancement from prior versions which did not provide this capability.
+The latest VST3 SDK (3.7.2) provides instructions to build a VST that doesn't live inside the SDK itself which is a big enhancement from prior versions which did not provide this capability.
 
 That being said, the solution introduced is still backward in my mind: you need to tell the SDK where your plugin is. The name of the project is still `vstsdk`.
 
-In addition, the VST3 SDK 3.6.9 introduced a couple of issues which makes it impossible to build it without using Xcode.
+In addition, the VST3 SDK 3.6 introduced a couple of issues which makes it impossible to build it without using Xcode.
 
 This project is exactly the `again` example that ships part of the VST3 SDK but self contained and *depending* on the SDK (vs being part of the SDK). As a result it can be used as a starting point to build other plugins.
 
@@ -21,22 +21,15 @@ Although this project is still valid, you should check [Jamba](https://github.co
 
 Configuration and requirements
 ------------------------------
-This project is known to work on macOS High Siera 10.13.3 with Xcode 9.2 installed. It requires `cmake` version 3.9 at the minimum. Because it uses `cmake` it should work on other platforms but it has not been tested.
+This project is known to work on macOS 10.15 with Xcode 12 installed. It requires `cmake` version 3.4.3 at the minimum. Because it uses `cmake` it should work on other platforms but it has not been tested.
 
 Downloading the SDK
 -------------------
-You need to download the VST3 SDK from [steinberg](https://download.steinberg.net/sdk_downloads/vstsdk369_01_03_2018_build_132.zip) (3.6.9 as of 2018/03/01 and what is used in this project) (shasum 256 => `7c6c2a5f0bcbf8a7a0d6a42b782f0d3c00ec8eafa4226bbf2f5554e8cd764964`).
+You need to download the VST3 SDK from [steinberg](https://www.steinberg.net/vst3sdk). It seems like they are updating this link with the current version periodically.
 
 Installing the SDK
 -------------------
-Unpack the SDK to a location of your choice (in my case the SDK is unpacked and renamed `/Applications/VST_SDK.369/`).
-
-Configuring the SDK
--------------------
-In order to build both VST2 and VST3 at the same time, you need to run the following commands
-
-    cd /Applications/VST_SDK.369/
-    ./copy_vst2_to_vst3_sdk.sh
+Unpack the SDK to a location of your choice (in my case the SDK is unpacked and renamed `/Applications/VST3_SDK`).
 
 Building this project
 ---------------------
@@ -48,7 +41,7 @@ Building this project
 
 - Generate the Makefile(s): `VST3_SDK_ROOT` needs to point to the root of the VST3 SDK (as installed/configured previously) and provide the path to the *source* of this project (which contains `CMakeLists.txt`):
 
-        cmake -DVST3_SDK_ROOT=/Applications/VST_SDK.369/VST3_SDK -DCMAKE_BUILD_TYPE=Debug /Volumes/Development/github/org.pongasoft/vst3-again-sample
+        cmake -DVST3_SDK_ROOT=/Applications/VST3_SDK -DCMAKE_BUILD_TYPE=Debug /Volumes/Development/github/org.pongasoft/vst3-again-sample
 
 - Now build the plugin (all its dependencies will be built as well):
 

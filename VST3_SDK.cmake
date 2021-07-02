@@ -1,7 +1,13 @@
 
+
+cmake_minimum_required (VERSION 3.4.3)
+
 #-------------------------------------------------------------------------------
-# Includes
+# Options
 #-------------------------------------------------------------------------------
+
+# Add and use VSTGUI (enable VST3 Plug-ins Samples using VSTGUI)
+option(SMTG_ADD_VSTGUI "Add VSTGUI Support" ON)
 
 if(VST3_SDK_ROOT)
   MESSAGE(STATUS "VST3_SDK_ROOT=${VST3_SDK_ROOT}")
@@ -9,50 +15,36 @@ else()
   MESSAGE(FATAL_ERROR "VST3_SDK_ROOT is not defined. Please use -DVST3_SDK_ROOT=<path to VST3 sdk>.")
 endif()
 
+#-------------------------------------------------------------------------------
+# Includes
+#-------------------------------------------------------------------------------
+
 list(APPEND CMAKE_MODULE_PATH "${VST3_SDK_ROOT}/cmake/modules")
 
-include(Global)
-include(AddVST3Library)
-include(Bundle)
-include(ExportedSymbols)
-include(PrefixHeader)
-include(PlatformIOS)
-include(PlatformToolset)
-include(CoreAudioSupport)
-include(AAXSupport)
-include(VstGuiSupport)
-include(UniversalBinary)
-include(AddVST3Options)
-
-# Run the validator after building
-#message(STATUS "Redefining smtg_run_vst_validator to fix VST3.6.9 version.")
-#function(smtg_run_vst_validator target)
-#    add_dependencies(${target} validator)
-#    if(WIN)
-#        set(TARGET_PATH $<TARGET_FILE:${target}>)
-#    elseif(XCODE)
-#        set(TARGET_PATH "${VST3_OUTPUT_DIR}/${CMAKE_BUILD_TYPE}/${target}.vst3")
-#    else()
-#        set(TARGET_PATH "${VST3_OUTPUT_DIR}/${target}.vst3")
-#    endif()
-#    add_custom_command(TARGET ${target} POST_BUILD COMMAND $<TARGET_FILE:validator> "${TARGET_PATH}" #WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-#endfunction()
+include(SMTG_VST3_SDK)
 
 #-------------------------------------------------------------------------------
 # SDK Project
 #-------------------------------------------------------------------------------
-setupPlatformToolset()
+project(vstsdk)
+
+smtg_setup_platform_toolset()
 
 set(ROOT "${VST3_SDK_ROOT}")
 
 # Here you can define where the VST 3 SDK is located
 set(SDK_ROOT "${ROOT}")
+set(public_sdk_SOURCE_DIR ${SDK_ROOT}/public.sdk)
+set(pluginterfaces_SOURCE_DIR ${SDK_ROOT}/pluginterfaces)
+
 
 # Here you can define where the VSTGUI is located
 if(SMTG_ADD_VSTGUI)
-  set(VSTGUI_ROOT "${ROOT}")
-  setupVstGuiSupport()
-endif()
+  set(SMTG_VSTGUI_ROOT "${ROOT}")
+  MESSAGE(STATUS "SMTG_VSTGUI_ROOT=${SMTG_VSTGUI_ROOT}")
+  smtg_enable_vstgui_support()
+endif(SMTG_ADD_VSTGUI)
+
 
 include_directories(${ROOT} ${SDK_ROOT})
 
